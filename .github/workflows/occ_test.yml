@@ -1,7 +1,6 @@
 name: OCC Connection Test
 
 on:
-  # هذا السطر يسمح بالتشغيل اليدوي من تبويب Actions
   workflow_dispatch:
 
 jobs:
