@@ -1,7 +1,8 @@
 name: OCC Connection Test
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ] # سيتم التشغيل تلقائياً عند أي تعديل على الكود
 
 jobs:
   test_connection:
