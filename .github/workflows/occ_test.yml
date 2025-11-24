@@ -22,4 +22,4 @@ jobs:
         pip install requests
 
     - name: Run OCC Connection Test
-      run: python test_occ_github.py
+      run: python test_occ.py
