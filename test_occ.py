@@ -1,10 +1,7 @@
 import requests
 import sys
 
-# =======================================================
-# بيانات البروكسي (تم تضمين بيانات Oxylabs الخاصة بك)
-# =======================================================
-PROXY_ADDRESS = "http://user-Davsa_RppK9-country-US:Aa+1020304050@dc.oxylabs.io:8000"
+PROXY_ADDRESS = "http://core-residential.evomi.com:1000:dhafersa5:VGpVsUraAdkBOKlBuy3L"
 
 # عنوان OCC للاختبار
 TEST_URL = "https://www.theocc.com/Market-Data/Market-Data-Reports/Other-Market-Data-Info/Batch-Processing/Series-Search-Batch-Processing" 
