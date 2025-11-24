@@ -1,7 +1,18 @@
 import requests
 import sys
 
-PROXY_ADDRESS = "http://core-residential.evomi.com:1000:dhafersa5:VGpVsUraAdkBOKlBuy3L"
+# =======================================================
+# بيانات البروكسي السكني (Evomi) - بناء يدوي للصيغة القياسية
+# =======================================================
+# نستخدم البيانات التي ظهرت في رسالة الخطأ الأخيرة (dhafersa5)
+PROXY_USER = "dhafersa5"
+PROXY_PASS = "VGpVsUraAdkBOKlBuy3L" 
+PROXY_HOST = "core-residential.evomi.com"
+PROXY_PORT = "1000"
+
+# بناء سلسلة البروكسي بالصيغة القياسية لـ requests: http://user:pass@host:port
+# هذه الصيغة هي الأكثر ضمانًا لنجاح التحليل (Parsing)
+PROXY_ADDRESS = f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}:{PROXY_PORT}"
 
 # عنوان OCC للاختبار
 TEST_URL = "https://www.theocc.com/Market-Data/Market-Data-Reports/Other-Market-Data-Info/Batch-Processing/Series-Search-Batch-Processing" 
@@ -16,26 +27,24 @@ STANDARD_HEADERS = {
 }
 
 def simple_occ_proxy_test():
-    print("Starting test connection to The OCC using Oxylabs Proxy...")
+    print("Starting test connection to The OCC using Evomi Residential Proxy...")
     
+    # استخدام الصيغة القياسية
     proxies = {
         "http": PROXY_ADDRESS,
         "https": PROXY_ADDRESS,
     }
 
     try:
-        response = requests.get(TEST_URL, headers=STANDARD_HEADERS, proxies=proxies, timeout=15)
+        response = requests.get(TEST_URL, headers=STANDARD_HEADERS, proxies=proxies, timeout=30)
         status = response.status_code
         
         if status == 200:
-            print(f"SUCCESS: Status Code 200 (OK). Proxy working.")
-            # تحقق إضافي لضمان جلب محتوى صحيح
-            if "Series Search - Batch Processing" in response.text:
-                print("Content Check: Expected page title found.")
+            print(f"SUCCESS: Status Code 200 (OK). Residential Proxy working!")
             return "SUCCESS_200"
         
         elif status == 403:
-            print(f"FAILURE: Status Code 403 (Forbidden). Proxy blocked.")
+            print(f"FAILURE: Status Code 403 (Forbidden). Residential IP was also blocked or requires rotation.")
             return "FAILED_403"
             
         else:
@@ -43,9 +52,10 @@ def simple_occ_proxy_test():
             return f"FAILED_{status}"
 
     except requests.exceptions.ProxyError:
-        print(f"FAILURE: Proxy connection error. Check proxy format and authentication.")
+        print(f"FAILURE: Proxy connection error. Evomi connection failed.")
         return "FAILED_PROXY_ERROR"
     except Exception as e:
+        # لن يحدث فشل في التحليل الآن، لكن إذا حدث، فستظهر رسالة الخطأ الفعلية
         print(f"FAILURE: Network or Timeout Error: {e}")
         return "FAILED_NETWORK_ERROR"
 
@@ -53,6 +63,5 @@ if __name__ == '__main__':
     result = simple_occ_proxy_test()
     print(f"\nFINAL RESULT: {result}")
     
-    # فشل GitHub Action إذا لم يكن ناجحاً
     if "SUCCESS" not in result:
         sys.exit(1)
