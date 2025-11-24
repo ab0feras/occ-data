@@ -1,8 +1,7 @@
-
 name: OCC Connection Test
 
 on:
-  workflow_dispatch: # يسمح بتشغيل الاختبار يدوياً من واجهة GitHub
+  workflow_dispatch:
 
 jobs:
   test_connection:
