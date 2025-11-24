@@ -1,58 +1,61 @@
 import requests
-import time
-import json
 import sys
 
-# Standard headers to simulate a real browser
+# =======================================================
+# بيانات البروكسي (تم تضمين بيانات Oxylabs الخاصة بك)
+# =======================================================
+PROXY_ADDRESS = "http://user-Davsa_RppK9-country-US:Aa+1020304050@dc.oxylabs.io:8000"
+
+# عنوان OCC للاختبار
+TEST_URL = "https://www.theocc.com/Market-Data/Market-Data-Reports/Other-Market-Data-Info/Batch-Processing/Series-Search-Batch-Processing" 
+
+# رؤوس قياسية لمحاكاة متصفح حقيقي
 STANDARD_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image:apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
     'Connection': 'keep-alive',
     'Referer': 'https://www.google.com/', 
 }
 
-# Test URL: Batch Processing information page
-TEST_URL = "https://www.theocc.com/Market-Data/Market-Data-Reports/Other-Market-Data-Info/Batch-Processing/Series-Search-Batch-Processing" 
-
-def simple_occ_test():
-    print("Starting test connection to The OCC from GitHub Actions...")
+def simple_occ_proxy_test():
+    print("Starting test connection to The OCC using Oxylabs Proxy...")
+    
+    proxies = {
+        "http": PROXY_ADDRESS,
+        "https": PROXY_ADDRESS,
+    }
 
     try:
-        print("Attempt 1...")
-        # Use headers in the request
-        response = requests.get(TEST_URL, headers=STANDARD_HEADERS, timeout=15)
+        response = requests.get(TEST_URL, headers=STANDARD_HEADERS, proxies=proxies, timeout=15)
         status = response.status_code
-
-        # Check response status
+        
         if status == 200:
-            print(f"SUCCESS: Status Code 200 (OK).")
-            print(f"Content length: {len(response.text)} bytes.")
-
-            # Check content to ensure it's not a hidden error page
+            print(f"SUCCESS: Status Code 200 (OK). Proxy working.")
+            # تحقق إضافي لضمان جلب محتوى صحيح
             if "Series Search - Batch Processing" in response.text:
-                print("Content Check: The expected page title was found.")
-                return "SUCCESS_CONTENT_MATCH"
-            else:
-                print("Content Check: WARNING! Page title not matched. Status 200 received but content might be unexpected.")
-                return "SUCCESS_CONTENT_MISMATCH"
-
+                print("Content Check: Expected page title found.")
+            return "SUCCESS_200"
+        
         elif status == 403:
-            print(f"FAILURE: Status Code 403 (Forbidden). Request blocked.")
+            print(f"FAILURE: Status Code 403 (Forbidden). Proxy blocked.")
             return "FAILED_403"
-
+            
         else:
             print(f"FAILURE: Received unexpected status code {status}.")
             return f"FAILED_{status}"
 
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.ProxyError:
+        print(f"FAILURE: Proxy connection error. Check proxy format and authentication.")
+        return "FAILED_PROXY_ERROR"
+    except Exception as e:
         print(f"FAILURE: Network or Timeout Error: {e}")
         return "FAILED_NETWORK_ERROR"
 
 if __name__ == '__main__':
-    result = simple_occ_test()
+    result = simple_occ_proxy_test()
     print(f"\nFINAL RESULT: {result}")
-
-    # Fail the GitHub Action if the test fails
+    
+    # فشل GitHub Action إذا لم يكن ناجحاً
     if "SUCCESS" not in result:
         sys.exit(1)
